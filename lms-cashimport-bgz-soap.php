@@ -36,7 +36,7 @@ $format_pliku = 'mt940';
 //echo 'wybrany format pliku to: '.$format_pliku."\n";
 
 // Wpisz tutaj login, hasło i identyfikator do systemu bankowego     
-// przeniesione do bazy LMS jako: bgz_username, bgz_password, bgz_firm
+// UWAGA: przeniesione do bazy LMS jako: bgz_username, bgz_password, bgz_firm
 //$pLogin = "";
 //$pPassword = "";
 //$pIden = "";
@@ -241,7 +241,6 @@ if($cfg = $DB->GetAll('SELECT * FROM cashsources WHERE name = "IDEN BGŻ"'))
                             ));
 
 // pobranie listy plikow z banku
-//$bgzDocuments = $soap_client->getDocuments(array('in0'=>$pLogin,'in1'=>$pPassword,'in2'=>$pIden));
 $bgzDocuments = $client->getDocuments(array('in0'=>$pLogin,'in1'=>$pPassword,'in2'=>$pIden));
 
 //dla kazdego pliku  
@@ -251,14 +250,12 @@ foreach($bgzDocuments->out->Document as $row){
 //foreach($bgzDocuments->out as $row){
 		//sprawdzenie czy plik jest zapisany w bazie
 		$query= "SELECT * FROM sourcefiles WHERE fileid = $row->id and name ='$row->name' and idate =UNIX_TIMESTAMP('". substr($row->fileDate,0,10)."')";
-		//echo $query; 
 		if($sql_plik = $DB->GetAll($query)){
 		echo "Plik ".$row->name." jest już w bazie.\n"; 
 		
 		}else{
 			echo "Dodaje plik ".$row->name." do bazy.\n"; 
 			//pobranie pliku		
-//			$bgzDocument = $soap_client->getDocument(array('in0'=>$row->id,'in1'=>$pLogin,'in2'=>$pPassword,'in3'=>$pIden));
 			$bgzDocument = $client->getDocument(array('in0'=>$row->id,'in1'=>$pLogin,'in2'=>$pPassword,'in3'=>$pIden));
 			if ($format_pliku  == 'elixir') {				// if elixir
 			    $plik=iconv("WINDOWS-1250","UTF-8",$bgzDocument->out);
